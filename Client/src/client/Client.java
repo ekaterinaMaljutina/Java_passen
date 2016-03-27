@@ -46,7 +46,7 @@ public class Client extends Thread{
                 //uuid = player.getIdPlyer();
                 if (player != null) {
 
-                    System.out.println("значит к нам добавился игрок и надо постать его сервер " + uuid);
+                    System.out.println("значит к нам добавился игрок и надо постать его сервер " );
 
                     System.out.println(player.getNamePlayer());
 
@@ -67,7 +67,7 @@ public class Client extends Thread{
         while (true){
             try {
 
-                String nameRoom =  dis.readUTF();
+               String nameRoom =  dis.readUTF();
                 System.out.println(" want create room ");
                 st.createRoom(nameRoom);
             } catch (IOException e) {
@@ -95,14 +95,14 @@ public class Client extends Thread{
 
     }
 
-    public synchronized void joinRoom() throws IOException, ClassNotFoundException {
+    public void joinRoom() throws IOException, ClassNotFoundException {
         System.out.println(" want to join in the room");
         while (true) {
             ObjectInputStream objectInputStream = new ObjectInputStream(cs.getInputStream());
             RoomInfo roomInfo = (RoomInfo) objectInputStream.readObject();
             if (roomInfo!=null) {
-                System.out.println("хотим присоедениться к комноте " + roomInfo.getName() + "    " +  roomInfo.getId());
-                System.out.println("хочет присоедениться игрок  " + player.getNamePlayer() + "  " + uuid);
+                System.out.println("хотим присоедениться к комноте " + roomInfo.getName());
+                System.out.println("хочет присоедениться игрок  " + player.getNamePlayer());
                 if ( st.joinRoom(roomInfo.getId(), uuid)){
                     st.sendToAll("ConnectionPlayer");
                 }
@@ -112,12 +112,12 @@ public class Client extends Thread{
         }
     }
 
-    public synchronized void deletePlayer(){
+    public void deletePlayer(){
         st.deleteClient(uuid);
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
         // отправили сообщение на сервер
         st.addToLog(" connection user with ID ");
         //st.sendToAll(id.toString());
@@ -125,7 +125,7 @@ public class Client extends Thread{
         // принимает сообщения от сервера
         while (flag){
             try {
-                //dis = new DataInputStream(cs.getInputStream());
+                dis = new DataInputStream(cs.getInputStream());
                 String s = dis.readUTF();
                 System.out.println("read " + s);
                 if (s.indexOf("-")!=-1){

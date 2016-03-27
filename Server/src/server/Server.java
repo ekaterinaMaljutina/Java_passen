@@ -33,7 +33,7 @@ public class Server extends Thread {
 
     private gameLister gameLister;
 
-    public synchronized void addToLog(String s)
+    public void addToLog(String s)
     {
         String str= log + s  + "\n";
         System.out.println(str);
@@ -63,7 +63,7 @@ public class Server extends Thread {
 
             //System.out.println(" user  " + key);
             Client value = entrySet.getValue();
-            System.out.println(" user  " + value.getPlayer().getNamePlayer() + " \n " + s);
+            System.out.println(" user  " + value.getPlayer().getNamePlayer() + "  " + key);
             value.sendMessage(s);
 
         }
@@ -79,7 +79,7 @@ public class Server extends Thread {
             if (player == null) {
                 System.out.println(" player is null");
             }
-            rooms.get(roomId).joinRoom(roomId, new Pair<>(playerId, player));
+            rooms.get(roomId).joinRoom(roomId, new Pair<>(roomId, player));
 
             if ( ! rooms.get(roomId).isFree()){
 
@@ -128,7 +128,7 @@ public class Server extends Thread {
             Player player_2 = null;
             if (room.getplayer_1_info() != null){
                 System.out.println( " yes player_1" );
-                player_1 = new Player(room.getplayer_1_info().getRight().getNamePlayer()); //,room.getplayer_1_info().getLeft() );
+                player_1 = new Player(room.getplayer_1_info().getRight().getNamePlayer());//,room.getplayer_1_info().getLeft() );
                 player_1.setPlayer(CellState.Player_1);
                 player_1.setLabel(Label.X);
                 System.out.println( player_1.getNamePlayer() );
@@ -136,7 +136,7 @@ public class Server extends Thread {
 
             if (room.getplayer_2_info() != null){
                 System.out.println( " yes player_2" );
-                player_2 = new Player(room.getplayer_2_info().getRight().getNamePlayer()); //,room.getplayer_2_info().getLeft() );
+                player_2 = new Player(room.getplayer_2_info().getRight().getNamePlayer());//,room.getplayer_2_info().getLeft() );
                 player_2.setPlayer(CellState.Player_2);
                 player_2.setLabel(Label.O);
             }
@@ -161,27 +161,10 @@ public class Server extends Thread {
             System.out.println(room.getRoomName());
             room.leaveRoom(id);
             room.roomInfo();
-            //rooms.get(key).roomInfo();
-            /*if (room!=null) {
-                if (room.getplayer_1_info().getRight() == null) {
-                    System.out.println(" player_1 is null ");
-                }
-                else {
-                    System.out.println(" player_1 " + room.getplayer_1_info().getRight().getNamePlayer());
-                }
-                if (room.getplayer_2_info() == null) {
-                    System.out.println(" player_2 is null ");
-                }
-            }
-            else {
-                System.out.println(" room is null ");
-            }*/
-            //rooms.remove(key);
-            //rooms.put(key,room);
         }
     }
 
-    public synchronized void deleteClient(UUID id){
+    public void deleteClient(UUID id){
         System.out.println("  игрок хочет покинуть игру, удаляем его из таблицы ");
         System.out.println(" было  " + playerHashtable.size());
         playerHashtable.remove(id);
@@ -195,11 +178,8 @@ public class Server extends Thread {
         while(true){
             try {
                 Socket cs = ss.accept();
-
-                Client client = new Client(this,cs, UUID.randomUUID());
-
+                Client client = new Client(this,cs ,UUID.randomUUID());
                 playerHashtable.put( client.getUUID(), client);
-
 
                 System.out.println("size tablPlayer = " + playerHashtable.size());
                 System.out.println(client.getUUID());

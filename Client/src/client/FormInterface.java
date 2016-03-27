@@ -17,9 +17,12 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import javax.swing.*;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.ObjectOutputStream;
+import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
+import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -47,9 +50,10 @@ public class FormInterface {
     private Player opponent;
 
     private List<RoomInfo> rooms;
-    //private GameBoard gameBoard;
+    private GameBoard gameBoard;
     private myThread myThread;
     private int indexRoom;
+    //private ThreadGame threadGame;
 
     private JPanel panel;
 
@@ -206,7 +210,6 @@ public class FormInterface {
 
                 dos = new DataOutputStream(cs.getOutputStream());
                 dos.writeUTF("exit");
-                myThread.setRun(false);
                 myThread.end();
                 //cs.close();
 
@@ -273,15 +276,17 @@ public class FormInterface {
 
                     ObjectOutputStream objectOutputStream= new ObjectOutputStream(cs.getOutputStream());
                     objectOutputStream.writeObject(r);
-                    myThread.setRun(false);
+                    //myThread.setRun(false);
                     stage.hide();
 
                     // создаем поля для игры
-                    System.out.println(" create game board");;
-                    /*gameBoard = new GameBoard();
+                    System.out.println(" create game board");
+                    //threadGame = new ThreadGame();
+                    //threadGame.start();
+                    gameBoard = new GameBoard();
                     gameBoard.initializeGame();
                     gameBoard.setVisible(true);
-*/
+
                     return;
 
                 } catch (IOException e) {
@@ -299,10 +304,10 @@ public class FormInterface {
 
 
 
-    /*public class GameBoard extends JFrame {
+    public class GameBoard extends JFrame {
         // UI
-        private JPanel panel;
-        private JLabel messageLabel = new JLabel("Hello");
+
+        //public JLabel messageLabel = new JLabel("Hello");
 
         // Game
         private Ground gameGround;
@@ -311,15 +316,13 @@ public class FormInterface {
         private EdgeState player_1 = EdgeState.Null;
         private EdgeState opponent = EdgeState.Null;
 
-        private ThreadGame threadGame;
+
 
         public GameBoard(){
 
             super("Passeng_Korid");
             initUI();
 
-            threadGame = new ThreadGame();
-            threadGame.start();
             // edgeSender = new EdgeSender(in, out);
 
         }
@@ -330,19 +333,23 @@ public class FormInterface {
             addWindowListener(new WindowAdapter() {
                 @Override
                 public void windowClosing(WindowEvent e) {
+
                     try {
-                        threadGame.end();
+                        dos = new DataOutputStream(cs.getOutputStream());
+                        dos.writeUTF("exit");
+                        //threadGame.end();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
+
                     super.windowOpened(e);
                 }
             });
 
 
             panel = new GPanel();
-            messageLabel.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 24));
-            panel.add(messageLabel);
+            //messageLabel.setFont(new java.awt.Font("Serif", java.awt.Font.PLAIN, 24));
+            //panel.add(messageLabel);
             add(panel);
         }
 
@@ -355,10 +362,10 @@ public class FormInterface {
 
         private void play() throws IOException  {
 
-            *//*while (true){
+            /*while (true){
 
-            }*//*
-            *//*String playerName = player.getNamePlayer();
+            }*/
+            /*String playerName = player.getNamePlayer();
             Player player1 = rooms.get(indexRoom).getplayer_1();
             Player player2 = rooms.get(indexRoom).getplayer_2();
             if (player1!=null && player2!=null){
@@ -370,16 +377,16 @@ public class FormInterface {
                 messageLabel.setText("Wait your oppenent");
                 boolean f = !myThread.flag_opponent;  // true
                 System.out.println(" wait with flag " + myThread.flag_opponent);
-                *//**//*while (f){
+                *//*while (f){
                     //System.out.println("here");
                     // ждем когда придет оповещение что игрок присоеденился
                     f = !myThread.flag_opponent;
                 }
                 if (!f){
                     messageLabel.setText("Your turn");
-                }*//**//*
+                }*//*
 
-            }*//*
+            }*/
             //String response;
 
                 //response = in.readLine();
@@ -387,21 +394,21 @@ public class FormInterface {
                 //System.out.print(response);
                 //if (response.startsWith("Hello")) {
                 //response.split(" ")[1];
-                    *//*if (playerName.equals("Player_1")) {
+                    /*if (playerName.equals("Player_1")) {
                         //player = gameGroundGraphics.player = EdgeState.Player_1;
                         //opponent = EdgeState.Player_2;
                         messageLabel.setForeground(Color.RED);
                         messageLabel.setText("Hello Player 1!");
-                    }*//*
-                    *//*if (playerName.equals("Player_2")) {
+                    }*/
+                    /*if (playerName.equals("Player_2")) {
                         //player = gameGroundGraphics.player = EdgeState.Player_2;
                         //opponent = EdgeState.Player_1;
                         messageLabel.setForeground(Color.BLUE);
                         messageLabel.setText("Hello Player 2!");
-                    }*//*
+                    }*/
                 //}
                 //while (true) {
-                    *//*response = in.readLine();
+                    /*response = in.readLine();
                     System.out.print(response + '\n');
                     if (response.startsWith("Successful_move")) {
                         messageLabel.setText("Valid move, please wait");
@@ -425,7 +432,7 @@ public class FormInterface {
                         processOpponentTurn(response);
                         messageLabel.setText("Opponent moved, please wait");
                         panel.repaint();
-                    }*//*
+                    }*/
                 //}
                 //System.out.print(response);
                 //out.println("QUIT");
@@ -443,6 +450,7 @@ public class FormInterface {
             public  ThreadGame(){
                 super();
 
+                //panel.add(messageLabel);
                 try {
 
                     dataInputStream = new DataInputStream(cs.getInputStream());
@@ -452,7 +460,7 @@ public class FormInterface {
             }
             @Override
             public void run() {
-                try {
+                /*try {
                     messageLabel.setText("Start Game");
                     dataInputStream = new DataInputStream(cs.getInputStream());
                     while (run) {
@@ -461,12 +469,11 @@ public class FormInterface {
                         System.out.println(" input: " + srt);
 
                         if (srt.equals("Player1")) {
-                            System.out.println("I am player_1. I want to play!");
                             messageLabel.setText("Wait your opponent");
                         }
 
                         if (srt.equals("OpponentIsReady")) {
-                            System.out.println("I am player_2. I want to play!");
+
                     *//*DataOutputStream dataOutputStream = new DataOutputStream(cs.getOutputStream());
                     dataOutputStream.writeUTF("");*//*
                             messageLabel.setText("Your turn");
@@ -475,14 +482,12 @@ public class FormInterface {
                     }
                 }catch (IOException e) {
                     e.printStackTrace();
-                }
+                }*/
 
             }
 
-            public  void  end() throws IOException{
+            public  void  end(){
                 System.out.println("close thread .....");
-                DataOutputStream dataOutputStream = new DataOutputStream(cs.getOutputStream());
-                dataOutputStream.writeUTF("exit");
                 run = false;
                 super.stop();
             }
@@ -510,5 +515,5 @@ public class FormInterface {
                 gameGroundGraphics.draw(graphics);
             }
         }
-    }*/
+    }
 }
